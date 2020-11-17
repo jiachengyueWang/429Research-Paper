@@ -28,13 +28,13 @@ Feature: Categorize tasks to better manage my time
       | what        | LOW        |
 
 
-#  Scenario Outline:  Categorize multiple tasks by priority(Alternate flow)
-#    Given I have tasks registered in the system
-#    When I categorize multiple tasks "<titleList>" as "<priority>"
-#    Then the tasks "<titleList>" should be categorized as "<priority>"
-#    And shut down server
-#
-#    Examples:
-#      | titleList                          | priority  |
-#      | scan paperwork,file paperwork      | HIGH      |
-#
+  Scenario Outline:  Categorize multiple tasks by priority(Alternate flow)
+    Given I have tasks registered in the system
+    When I categorize multiple tasks "<titleList>" as "<priority>"
+    Then the tasks "<titleList>" should be categorized as "<priority>"
+    And shut down server
+
+    Examples:
+      | titleList                          | priority  |
+      | scan paperwork,file paperwork      | HIGH      |
+
