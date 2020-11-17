@@ -4,7 +4,7 @@ Feature: Add tasks to course to do list
 
   Background:
     Given I have a task to be registered in the todoManagerRestAPI system
-      | A3 | false |       |
+    | A3 | false |       |
 
   Scenario Outline: Add a task to a to do list(Normal flow)
     When I add task "<title>", "<doneStatus>", "<description>"

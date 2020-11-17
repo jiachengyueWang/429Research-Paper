@@ -23,7 +23,6 @@ public class stepDefinitions {
         Unirest.get("/shutdown");
     }
 
-    //categorise_task
     @Given("I have categories registered in the todoManagerRestAPI system")
     public void i_have_categories_registered_in_the_todoManagerRestAPI_system() {
         HttpResponse<JsonNode> jsonResponse
@@ -31,7 +30,7 @@ public class stepDefinitions {
                 .asJson();
         assertNotNull(jsonResponse.getBody());
         assertEquals(200, jsonResponse.getStatus());
-    }
+        }
 
 
     @Given("I have tasks registered in the system")
@@ -41,7 +40,7 @@ public class stepDefinitions {
                 .asJson();
         assertNotNull(jsonResponse.getBody());
         assertEquals(200, jsonResponse.getStatus());
-    }
+        }
 
     @When("I categorize {string} as {string}")
     public void i_categorize_task_as_priority(String t, String p) {
@@ -107,8 +106,6 @@ public class stepDefinitions {
         }
     }
 
-
-    //add_tasks
     @Given("I have a task to be registered in the todoManagerRestAPI system")
     public void i_have_a_task_to_be_registered_in_the_todoManagerRestAPI_system(DataTable dataTable) {
         rows = dataTable.asLists(String.class);
@@ -117,9 +114,9 @@ public class stepDefinitions {
     @When("I add task {string}, {string}, {string}")
     public void i_add_task(String t, String s, String d) {
         HttpResponse<JsonNode> response = Unirest.post("http://localhost:4567/todos")
-                .body("{\"title\":\"" + t.replace("\"", "") + "\",\"doneStatus\":"
-                        + s.replace("\"", "") + ",\"description\":\"" + d.replace("\"", "") + "\"}")
-                .asJson();
+        .body("{\"title\":\"" + t.replace("\"", "") + "\",\"doneStatus\":"
+                + s.replace("\"", "") + ",\"description\":\"" + d.replace("\"", "") + "\"}")
+        .asJson();
         statusCode = response.getStatus();
         if(statusCode != 201) {
             errorMessage = response.getBody().getObject().getJSONArray("errorMessages").getString(0);
@@ -161,84 +158,143 @@ public class stepDefinitions {
         }
     }
 
-
-    //change_task_description
-    //normal flow
-    @Given("I have description registered in the todoManagerRestAPI system")
-    public void i_have_description_registered_in_the_todoManagerRestAPI_system() {
-        HttpResponse<JsonNode> jsonResponse
-                = Unirest.get("http://localhost:4567/categories")
-                .asJson();
-        assertNotNull(jsonResponse.getBody());
-        assertEquals(200, jsonResponse.getStatus());
-    }
-
-
-    @When("I change {string} of {string}")
-    public void i_change_description_of_task(String description, String task) {
+    @Given("I have a task {string}")
+    public void i_have_a_task(String t) {
         id = 1;
+        int id2 = -1;
         HttpResponse<JsonNode> jsonResponse = null;
-        while(true) {
-            jsonResponse = Unirest.get("http://localhost:4567/todos/{id}")
-                    .routeParam("id", String.valueOf(id))
-                    .asJson();
-            if (jsonResponse.getBody().toString().contains(task)) {
-                HttpResponse<JsonNode> response = Unirest.post("http://localhost:4567/todos/" + id +"/description")
-                        .body("{\n\"description\":\"" + description + "\"\n}\n")
-                        .asJson();
-                statusCode = response.getStatus();
-                if(statusCode != 200 && statusCode != 201) {
-                    errorMessage = response.getBody().getObject().getJSONArray("errorMessages").getString(0);
-                }
-                break;
-            }
-            else if(jsonResponse.getStatus() != 200){
-                errorMessage = jsonResponse.getBody().getObject().getJSONArray("errorMessages").getString(0);
-                break;
-            }
-            id++;
-        }
-    }
-
-    @Then("the description of the {string} is changed to {string}")
-    public void description_is_changed(String description, String task) {
-        id = 1;
-        HttpResponse<JsonNode> jsonResponse = null;
-        assertTrue(1 == 1);
         do {
             jsonResponse = Unirest.get("http://localhost:4567/todos/{id}")
                     .routeParam("id", String.valueOf(id))
                     .asJson();
-
-            if (jsonResponse.getBody().toString().contains(task)) {
-//
-                assertTrue(jsonResponse.getBody().toString().contains(description));
+            if (jsonResponse.getBody().toString().contains(t)) {
+                id2 = id;
                 break;
             }
             id++;
         }while (jsonResponse.getStatus() == 200);
     }
 
-    @When("I change {string} of multiple {string}")
-    public void i_change_descriptions_of_multiple_tasks(String tl, String dl){
-        String[] tasks = tl.split(",");
-        String[] descriptions = dl.split(",");
-        int length = tasks.length;
-        for(int i = 0; i < length; i++){
-            i_change_description_of_task(tasks[i], descriptions[i]);
+    @When("I mark a task {string} as done")
+    public void i_mark_a_task_as_done(String t) {
+        String s = "true";
+        String d = " ";
+        HttpResponse<JsonNode> response = Unirest.post("http://localhost:4567/todos/")
+                .body("{\"title\":\"" + t.replace("\"", "") + "\",\"doneStatus\":"
+                        + s.replace("\"", "") + ",\"description\":\"" + d.replace("\"", "") + "\"}")
+                .asJson();
+        statusCode = response.getStatus();
+        if(statusCode != 201) {
+            errorMessage = "Cannot post task with " + t +"," + s + "," + d;
         }
     }
 
-    @Then("the descriptions of the {string} are changed to {string}")
-    public void descriptions_are_change(String tl, String dl){
+    @Then("task {string} is marked")
+    public void task_is_marked(String t) {
+        id = 1;
+        HttpResponse<JsonNode> jsonResponse = null;
+        do {
+            jsonResponse = Unirest.get("http://localhost:4567/todos/{id}")
+                    .routeParam("id", String.valueOf(id))
+                    .asJson();
+            if (jsonResponse.getBody().toString().contains(t) && jsonResponse.getBody().toString().contains("true")) {
+                break;
+            }
+            id++;
+        }while (jsonResponse.getStatus() == 200);
+    }
+
+    @Given("I have multiple tasks {string}")
+    public void i_have_multiple_tasks(String tl) {
         String[] tasks = tl.split(",");
-        String[] descriptions = dl.split(",");
         int length = tasks.length;
         for(int i = 0; i < length; i++){
-            description_is_changed(tasks[i], descriptions[i]);
+            i_have_a_task(tasks[i]);
         }
+    }
+
+    @When("I mark multiple tasks {string} as done")
+    public void i_mark_multiple_tasks_as_done(String tl) {
+        String[] tasks = tl.split(",");
+        int length = tasks.length;
+        for(int i = 0; i < length; i++){
+            i_mark_a_task_as_done(tasks[i]);
+        }
+    }
+
+    @Then("tasks {string} is marked")
+    public void tasks_is_marked(String tl) {
+        String[] tasks = tl.split(",");
+        int length = tasks.length;
+        for(int i = 0; i < length; i++){
+            task_is_marked(tasks[i]);
+        }
+    }
+
+    @Given("task {string} doneStatus is true")
+    public void task_doneStatus_is_true(String t) {
+        id = 1;
+        HttpResponse<JsonNode> jsonResponse = null;
+        do {
+            jsonResponse = Unirest.get("http://localhost:4567/todos/{id}")
+                    .routeParam("id", String.valueOf(id))
+                    .asJson();
+            if (jsonResponse.getBody().toString().contains(t) && jsonResponse.getBody().toString().contains("true")) {
+                break;
+            }
+            id++;
+        }while (jsonResponse.getStatus() == 200);
+    }
+
+    @When("I remove a task {string}")
+    public void i_remove_a_task(String t) {
+        HttpResponse<JsonNode> response = Unirest.delete("http://localhost:4567/todos/{id}")
+                .routeParam("id", String.valueOf(id))
+                .asJson();
+        assertEquals(200, response.getStatus());
+    }
+
+    @Then("the task {string} is removed")
+    public void the_task_is_removed(String t) {
+        id = 1;
+        HttpResponse<JsonNode> jsonResponse = null;
+        do {
+            jsonResponse = Unirest.get("http://localhost:4567/todos/{id}")
+                    .routeParam("id", String.valueOf(id))
+                    .asJson();
+            if (jsonResponse.getBody().toString().contains(t) && jsonResponse.getBody().toString().contains("true")) {
+                errorMessage = "the task is not removed!";
+                break;
+            }
+            id++;
+        }while (jsonResponse.getStatus() == 200);
+
+    }
+
+    @Given("I have a new project")
+    public void i_have_a_new_project(DataTable table) {
+        String d = " ";
+        List<List<String>> rows = table.asLists(String.class);
+        for (List<String> columns : rows) {
+            Unirest.post("http://localhost:4567/projects")
+                    .body("{\"title\":\"" + columns.get(0).replace("\"", "") + "\",\"completed\":"
+                            + columns.get(1).replace("\"", "") + "\",\"active\":"
+                            + columns.get(2).replace("\"", "") + ",\"description\":\"" + d.replace("\"", "") + "\"}")
+                    .asJson();
+        }
+    }
+
+    @Given("I have a to do list {String}")
+    public void i_have_a_to_do_list(String todo) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
+    }
+
+    @When("I create a to do list for the project {string}")
+    public void i_create_a_to_do_list_for_the_project(String string) {
+        // Write code here that turns the phrase above into concrete actions
+        throw new io.cucumber.java.PendingException();
     }
 
 
 }
-
