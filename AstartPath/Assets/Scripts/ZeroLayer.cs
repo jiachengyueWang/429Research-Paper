@@ -40,18 +40,18 @@ public class ZeroLayer : MonoBehaviour {
     }
   }
 
-  private Vector3 FindClosestCell(Vector3 startPosition) {
-    GameObject closest = null;
-    float distance = Mathf.Infinity;
-    Vector3 position = startPosition;
-    foreach (GameObject gameObject in grid.allCells) {
-      Vector3 diff = gameObject.transform.position - position;
-      float curDistance = diff.sqrMagnitude;
-      if (curDistance < distance) {
-        closest = gameObject;
-        distance = curDistance;
-      }
-    }
-    return closest.transform.position;
-  }
+  // private Vector3 FindClosestCell(Vector3 startPosition) {
+  //   GameObject closest = null;
+  //   float distance = Mathf.Infinity;
+  //   Vector3 position = startPosition;
+  //   foreach (GameObject gameObject in grid.allCells) {
+  //     Vector3 diff = gameObject.transform.position - position;
+  //     float curDistance = diff.sqrMagnitude;
+  //     if (curDistance < distance) {
+  //       closest = gameObject;
+  //       distance = curDistance;
+  //     }
+  //   }
+  //   return closest.transform.position;
+  // }
 }

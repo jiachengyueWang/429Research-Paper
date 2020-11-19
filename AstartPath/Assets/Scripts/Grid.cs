@@ -5,15 +5,23 @@ public class Grid : MonoBehaviour {
   public GameObject cellPrefab;
   public int numberOfCells;
   public int cellsPerRow;
-  public int startID = 12;
-  public int targetID = 87;
+  public int startID;
+  public int targetID;
   public bool isCalculating = false;
 
   public ArrayList allCells;
+
   private ArrayList openList;
   private ArrayList closedList;
   private Cell startCell;
   private Cell targetCell;
+
+  //WJCY
+  int[] pointsL;
+  int[] pointsW;
+
+
+  //wjcy
 
   void Start() {
     CreateCells();
@@ -31,7 +39,7 @@ public class Grid : MonoBehaviour {
       counter += 1;
       xOffset += 1;
       //GameObject newCell = (GameObject)Instantiate(cellPrefab, new Vector3(transform.position.x + xOffset, transform.position.y, transform.position.z + zOffset), transform.rotation);
-       GameObject newCell = (GameObject)Instantiate(cellPrefab, new Vector3(xOffset, 0, zOffset), transform.rotation);
+      GameObject newCell = (GameObject)Instantiate(cellPrefab, new Vector3(xOffset, 0, zOffset), transform.rotation);
       newCell.GetComponent<Cell>().id = i;
       allCells.Add(newCell);
 
@@ -41,7 +49,140 @@ public class Grid : MonoBehaviour {
         zOffset += 1;
       }
     }
+
+    createAlcoves(pointsL, pointsW);
   }
+
+
+  //WJCY
+  public void createAlcoves(int[] pointsL, int[] pointsW){
+    int id = 374;
+    //x-axis UP
+    pointsL = new int[]{ 2, 5, 8, 10, 15, 19 };
+    alcove_length(pointsL, 3, 5, 2, id, true);
+
+    //x-axis BOTTOM
+    pointsL = new int[]{4, 6, 10, 13, 17, 19};
+    alcove_length(pointsL, 6, 2, 3, id, false);
+
+    //z-axis LEFT
+    pointsW = new int[]{5, 9, 12, 14};
+    alcove_width(pointsW, 4, 3, id, false);
+
+    //z-axis RIGHT
+    pointsW = new int[]{3, 6,  9, 13};
+    alcove_width(pointsW, 3, 1, id, true);
+
+  }
+
+  void alcove_length(int[] points, int t0, int t1, int t2, int id, bool up){
+    GameObject newCell;
+    Vector3 position;
+
+    //1st bump
+    int x = points[0];
+    while(x < points[1]){
+      for(int i = 0; i < t0; i++){
+        if(up){
+          position = new Vector3 (x, 0, 16 + i);
+        }else {
+          position = new Vector3 (x, 0, 0 - i);
+        }
+        
+        newCell = (GameObject)Instantiate(cellPrefab, position, transform.rotation);
+        newCell.GetComponent<Cell>().id = id;
+        id++;
+        allCells.Add(newCell);
+      }
+      x++;
+    }
+    
+    //2nd bump
+    x = points[2];
+    while(x < points[3]){
+      for(int i = 0; i < t1; i++){
+        if(up){
+          position = new Vector3 (x, 0, 16 + i);
+        }else {
+          position = new Vector3 (x, 0, 0 - i);
+        }
+        newCell = (GameObject)Instantiate(cellPrefab, position, transform.rotation);
+        newCell.GetComponent<Cell>().id = id;
+        id++;
+        allCells.Add(newCell);
+      }
+      x++;
+    }
+    
+    //3rd bump
+    x = points[4];
+    while(x < points[5]){
+      for(int i = 0; i < t2; i++){
+        if(up){
+          position = new Vector3 (x, 0, 16 + i);
+        }else {
+          position = new Vector3 (x, 0, 0 - i);
+        }
+        newCell = (GameObject)Instantiate(cellPrefab, position, transform.rotation);
+        newCell.GetComponent<Cell>().id = id;
+        id++;
+        allCells.Add(newCell);
+      }
+      x++;
+    }
+  }
+
+  void alcove_width(int[] points, int t0, int t1, int id, bool right){
+    GameObject newCell;
+    Vector3 position;
+
+    //1st bump
+    int z = points[0];
+    while(z < points[1]){
+      for(int i = 0; i < t0; i++){
+        if(right){
+          position = new Vector3 (23 + i, 0, z);
+        }else {
+          position = new Vector3 (0 - i, 0, z);
+        }
+        
+        newCell = (GameObject)Instantiate(cellPrefab, position, transform.rotation);
+        newCell.GetComponent<Cell>().id = id;
+        id++;
+        allCells.Add(newCell);
+      }
+      z++;
+    }
+
+    //2nd bump
+    z = points[2];
+    while(z < points[3]){
+      for(int i = 0; i < t1; i++){
+        if(right){
+          position = new Vector3 (23 + i, 0, z);
+        }else {
+          position = new Vector3 (0 - i, 0, z);
+        }
+        
+        newCell = (GameObject)Instantiate(cellPrefab, position, transform.rotation);
+        newCell.GetComponent<Cell>().id = id;
+        id++;
+        allCells.Add(newCell);
+      }
+      z++;
+    }
+
+
+  }
+
+
+
+
+
+  //wjcy
+
+
+
 
   public void CalculatePathExternal() {
     // Reset all cells
