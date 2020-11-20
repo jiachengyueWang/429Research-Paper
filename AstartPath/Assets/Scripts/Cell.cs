@@ -10,9 +10,9 @@ public class Cell : MonoBehaviour {
   public float F;
   public float G;
   public float H;
-  public TextMesh displayF;
-  public TextMesh displayG;
-  public TextMesh displayH;
+  // public TextMesh displayF;
+  // public TextMesh displayG;
+  // public TextMesh displayH;
   public TextMesh displayID;
   public GameObject indicator;
   public GameObject indicatorDisplay;
@@ -26,6 +26,15 @@ public class Cell : MonoBehaviour {
   private Renderer currentRenderer;
   private Grid grid;
 
+
+
+  //WJCY
+  private SetUp setup;
+  //wjcy
+
+
+
+
   void Awake() {
     currentRenderer = GetComponent<Renderer>();
   }
@@ -33,7 +42,21 @@ public class Cell : MonoBehaviour {
   void Start() {
     materialValid = currentRenderer.material;
     grid = FindObjectOfType<Grid>();
+    setup = FindObjectOfType<SetUp>();
   }
+
+
+
+
+  //WJCY
+  void Update(){
+
+  }
+
+  //wjcy
+
+
+
 
   public void Reset() {
     parent = null;
@@ -54,29 +77,29 @@ public class Cell : MonoBehaviour {
 
   void FixedUpdate() {
     // Display Cell Information
-    if (isValid) {
-      if (F == 0.0f) {
-        displayF.text = "";
-      } else {
-        displayF.text = "F: " + F.ToString("F2");
-      }
+    // if (isValid) {
+    //   if (F == 0.0f) {
+    //     displayF.text = "";
+    //   } else {
+    //     displayF.text = "F: " + F.ToString("F2");
+    //   }
 
-      if (G == 0.0f) {
-        displayG.text = "";
-      } else {
-        displayG.text = "G: " + G.ToString("F2");
-      }
+    //   if (G == 0.0f) {
+    //     displayG.text = "";
+    //   } else {
+    //     displayG.text = "G: " + G.ToString("F2");
+    //   }
 
-      if (H == 0.0f) {
-        displayH.text = "";
-      } else {
-        displayH.text = "H: " + H.ToString("F2");
-      }
-    } else {
-      displayF.text = "";
-      displayG.text = "";
-      displayH.text = "";
-    }
+    //   if (H == 0.0f) {
+    //     displayH.text = "";
+    //   } else {
+    //     displayH.text = "H: " + H.ToString("F2");
+    //   }
+    // } else {
+    //   displayF.text = "";
+    //   displayG.text = "";
+    //   displayH.text = "";
+    // }
 
     displayID.text = "" + id;
 
@@ -87,6 +110,21 @@ public class Cell : MonoBehaviour {
     } else
       indicatorRenderer.enabled = false;
   }
+
+  //WJCY: need adjustment to give different startid and targetid, corresponds to the pair
+  void OnTriggerEnter(Collider other){
+    if (other.tag == "Start")
+      grid.startID = this.id;
+    else if (other.tag == "Target")
+      grid.targetID = this.id;
+  }
+
+
+
+  //wjcy
+
+
+
 
   void OnTriggerStay(Collider other) {
     if (other.tag == "Obstacle") {

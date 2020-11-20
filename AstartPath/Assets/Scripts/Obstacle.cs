@@ -2,6 +2,7 @@
 using System.Collections;
 
 public class Obstacle : MonoBehaviour {
+
   // private ZeroLayer zeroLayer;
 
   // void Start() {
@@ -16,4 +17,5 @@ public class Obstacle : MonoBehaviour {
   //   if (Input.GetKey(KeyCode.Mouse0))
   //     zeroLayer.otherCube = gameObject;
   // }
+
 }
