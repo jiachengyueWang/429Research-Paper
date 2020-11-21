@@ -4,14 +4,17 @@ using UnityEngine;
 
 public class AgentNDest : MonoBehaviour
 {
-
+    
     GameObject agent_in_use;
     GameObject dest_in_use;
-    int agent_id ;
-    int dest_id ;
+    // int agent_id ;
+    // int dest_id ;
+    Vector3 agent_position;
+    Vector3 dest_position;
 
     private Grid grid;
     private SetUp setup;
+    bool isDone = false;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,72 +27,41 @@ public class AgentNDest : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // if(!grid.isCalculating){
-        //     if (Input.GetKey(KeyCode.Mouse0)){
-        //         Debug.Log(agent_id);
-        //         Debug.Log(dest_id);
-        //         // grid.CalculatePathExternal(agent_id, dest_id);
-        //     }
-        // }
-        // if (!grid.isCalculating) {
-        //     if (Input.GetKey(KeyCode.Mouse0)){
-        //         for(int i = 0; i < numPair; i++){
-        //             Debug.Log("Pair");
-                    
-                    
-        //         }
-        //         grid.CalculatePathExternal(agent_id, dest_id);
-        //     }
-            
 
-        // }
-        // if(grid.get_isDone()){
-            
-        //     //StartCoroutine( update_Pair());
-        //     //remove the positions
-        //     setup.removeLocation(agent_in_use.transform.position);
-        //     agent_in_use.transform.position = dest_in_use.transform.position + new Vector3 (0, 1f, 0);
-        //     setup.removeLocation(dest_in_use.transform.position);
-        //     dest_in_use.transform.position = setup.nextDestPosition();
-
-        //     grid.set_isDone(false);
-        // }
     }
 
 
-    public AgentNDest(GameObject agent, GameObject dest, int agent_id, int dest_id){
+    public AgentNDest(GameObject agent, GameObject dest, Vector3 agent_position, Vector3 dest_position){
         this.agent_in_use = agent;
         this.dest_in_use = dest;
-        this.agent_id = agent_id;
-        this.dest_id = dest_id;
-        // startPathing();
+        this.agent_position = agent_position;
+        this.dest_position = dest_position;
     }
 
-    void startPathing(){
-        grid.CalculatePathExternal(agent_id, dest_id);
+
+    public Vector3 getAgentPosition(){
+        return agent_position;
     }
 
-    // public void createPair(Vector3 agent_position, Vector3 dest_position){
-    //     int prefab_id = Random.Range(0, 6);
-    //     Instantiate(agents[prefab_id], agent_position + new Vector3 (0, 1, 0), Quaternion.identity);
-    //     Instantiate(destinations[prefab_id], dest_position, Quaternion.identity);
-    // }
+    public Vector3 getDestPosition(){
+        return dest_position;
+    }
+    
+    public GameObject getAgent(){
+        return agent_in_use;
+    }
 
-    // public void setID(int agent_id, int dest_id){
-        
-    //     this.agent_id = agent_id;
-    //     this.dest_id = dest_id;
-    // }
+    public GameObject getDest(){
+        return dest_in_use;
+    }
 
-    // //just checking
-    // public void printID(){
-    //     Debug.Log(agent_id);
-    //     Debug.Log(dest_id);
-    // }
+    public bool get_isDone(){
+        return isDone;
+    }
 
-
-
-
+    public void set_isDone(bool isDone){
+        this.isDone = isDone;
+    }
 
 }
 

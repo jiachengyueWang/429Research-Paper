@@ -27,7 +27,7 @@ public class Grid : MonoBehaviour {
 
   //WJCY
   //OBSTACLES
-  public int numObstacle;
+  int numObstacle;
   public GameObject obstaclePrefab;
 
   //AGENTS & DESTs
@@ -56,6 +56,8 @@ public class Grid : MonoBehaviour {
   public int numPair;
   List<int> agentID = new List<int>();
   List<int> destID = new List<int>();
+  List<AgentNDest> pairs = new List<AgentNDest>();
+  // ArrayList<AgentNDest> pairs = new ArrayList<AgentNDest>();
 
 
   //GAME LEVEL
@@ -89,35 +91,6 @@ public class Grid : MonoBehaviour {
   }
 
   void Update(){
-
-    // if(!isCalculating){
-    //   if(Input.GetKey(KeyCode.Mouse0)){
-    //     CalculatePathExternal(agentID[0], destID[0]);
-    //     // for(int i = 0; i < numPair; i++){
-    //     //   CalculatePathExternal(agentID[i], destID[i]);
-    //     // }
-
-    //   }
-    // }
-    // if (!grid.isCalculating) {
-    //   if(Input.GetKey(KeyCode.Mouse0)){
-    //     grid.CalculatePathExternal(agent_id, dest_id);
-
-    //   }
-      
-            
-
-    // }
-
-    // if(grid.get_isDone()){
-
-    //   usedCell.Remove(agent_in_use.transform.position);
-    //   agent_in_use.transform.position = dest_in_use.transform.position + new Vector3 (0, 1f, 0);
-    //   usedCall.Remove(dest_in_use.transform.position);
-    //   dest_in_use.transform.position = setup.nextDestPosition();
-    //   grid.set_isDone(false);
-
-    //   }
   }
 
   //initialise the prefab database
@@ -142,9 +115,6 @@ public class Grid : MonoBehaviour {
     destinations.Add(dest_5);
     destinations.Add(dest_6);
   }
-
-
-
 
   private void CreateCells() {
     allCells = new ArrayList();
@@ -171,8 +141,6 @@ public class Grid : MonoBehaviour {
     createAlcoves(points_0, points_1, points_2, points_3);
   }
 
-  //WJCY
-
   //return the position of the cell with id
   Vector3 getCell(int id){
     return allCells_position[id];
@@ -188,12 +156,12 @@ public class Grid : MonoBehaviour {
       //create ADpair
       agent_cell_id = Random.Range(0, 373);
       // agent_cell_id = Random.Range(0, 459);
-      agent_position = getCell(agent_cell_id);
+      agent_position = getCell(agent_cell_id) + new Vector3 (0, 1, 0);
       while(overlap(agent_position)){
         agent_cell_id = Random.Range(0, 373);
         // agent_cell_id = Random.Range(0, 459);
       }
-      agent_position = getCell(agent_cell_id);
+      agent_position = getCell(agent_cell_id) + new Vector3 (0, 1, 0);
 
       dest_cell_id = Random.Range(0, 373);
       // dest_cell_id = Random.Range(0, 459);
@@ -205,11 +173,12 @@ public class Grid : MonoBehaviour {
       dest_position = getCell(dest_cell_id);
 
       //create a new pair
-      GameObject newAgent = (GameObject) Instantiate(agents[i % 7], agent_position + new Vector3 (0, 1, 0), Quaternion.identity);
+      GameObject newAgent = (GameObject) Instantiate(agents[i % 7], agent_position, Quaternion.identity);
       GameObject newDest = (GameObject) Instantiate(destinations[i % 7], dest_position, Quaternion.identity);
-      AgentNDest newPair = new AgentNDest(newAgent, newDest, agent_cell_id, dest_cell_id);
-      
+      AgentNDest newPair = new AgentNDest(newAgent, newDest, agent_position, dest_position);
+      pairs.Add(newPair);
 
+      
       agentID.Add(agent_cell_id);
       destID.Add(dest_cell_id);
       usedCell.Add(agent_position);
@@ -217,13 +186,35 @@ public class Grid : MonoBehaviour {
     }
   }
 
+  public void updatePair(int pairNo){
+    //remove the agent position 
+    RemoveLocation(pairs[pairNo].getAgent().transform.position);
+    agentID[pairNo] = destID[pairNo];
+    //move agent position to dest
+    pairs[pairNo].getAgent().transform.position = pairs[pairNo].getDest().transform.position + new Vector3(0, 1, 0);
+    //get next dest position
+    int newid = nextDestPosition();
+    destID[pairNo] = newid;
+    pairs[pairNo].getDest().transform.position = getCell(newid);
+    usedCell.Add(getCell(newid) + new Vector3(0, 1, 0));
+  }
+
+  public int nextDestPosition(){
+    int next_id = Random.Range(0, 373);
+    Vector3 next_position = getCell(next_id);
+    while(overlap(next_position)){
+      next_id = Random.Range(0, 373);
+      next_position = getCell(next_id);
+    }
+    return next_id;
+  }
+
+
   //check if we chose a valid position to spawn objects
   bool overlap(Vector3 loc){
     bool overlap = false;
     foreach(Vector3 loc_invalid in usedCell){
       if (Math.Abs(loc.x - loc_invalid.x) < 1 && Math.Abs(loc.z - loc_invalid.z) < 1){
-        Debug.Log(loc);
-        Debug.Log(loc_invalid);
         return true;
       }
     }
@@ -354,39 +345,24 @@ public class Grid : MonoBehaviour {
     }
   }
 
-  //wjcy
+  // public void CalculatePathExternal(int startID, int targetID) {
+  //   // Reset all cells
+  //   foreach (GameObject gameObject in allCells) {
+  //     gameObject.GetComponent<Cell>().Reset();
+  //   }
 
+  //   StartCoroutine(CalculatePath(startID, targetID));
+  // }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  public void CalculatePathExternal(int startID, int targetID) {
+  public void CalculatePathExternal(int pairNo) {
     // Reset all cells
     foreach (GameObject gameObject in allCells) {
       gameObject.GetComponent<Cell>().Reset();
     }
-
-    StartCoroutine(CalculatePath(startID, targetID));
+    StartCoroutine(CalculatePath(agentID[pairNo], destID[pairNo]));
   }
-    private IEnumerator CalculatePath(int startID, int targetID) {
+
+  private IEnumerator CalculatePath(int startID, int targetID) {
 
     isCalculating = true;
     
@@ -533,6 +509,17 @@ public class Grid : MonoBehaviour {
   }
   public List<int> getDestID(){
     return this.destID;
+  }
+
+  public List<AgentNDest> getPairs(){
+    return this.pairs;
+  }
+
+
+  public void RemoveLocation(Vector3 position){
+    Debug.Log(usedCell.Count);
+    usedCell.Remove(position);
+    Debug.Log(usedCell.Count);
   }
 }
 
