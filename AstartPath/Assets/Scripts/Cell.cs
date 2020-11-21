@@ -112,11 +112,22 @@ public class Cell : MonoBehaviour {
   }
 
   //WJCY: need adjustment to give different startid and targetid, corresponds to the pair
+
   void OnTriggerEnter(Collider other){
     if (other.tag == "Start")
       grid.startID = this.id;
     else if (other.tag == "Target")
       grid.targetID = this.id;
+  }
+
+  public Cell getCell(int id){
+    Debug.Log("getPosition used");
+    if(this.id == id){
+      Debug.Log("found");
+      return this;
+    }else{
+      return null;
+    }
   }
 
 
@@ -132,10 +143,14 @@ public class Cell : MonoBehaviour {
         isValid = false;
         currentRenderer.material = materialInvalid;
       }
-    } else if (other.tag == "Start")
+    } 
+    else if (other.tag == "Start"){
       grid.startID = this.id;
-    else if (other.tag == "Target")
+    }
+      
+    else if (other.tag == "Target"){
       grid.targetID = this.id;
+    }
   }
 
   void OnTriggerExit(Collider other) {

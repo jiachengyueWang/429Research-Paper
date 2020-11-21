@@ -10,6 +10,8 @@ public class Waypoints : MonoBehaviour
     public float speed;
     float WPradius = 1;
 
+    
+
 
 
     // Start is called before the first frame update

@@ -3,7 +3,37 @@ guid: 79376e2feaedc476692b71d30c50f45a
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - agent: {fileID: 7538795158711477804, guid: 9c313b35032de4b089325052a1479431, type: 3}
+  - agent_0: {fileID: 2767478339806356796, guid: 4f6f6496b8c4c4cfebfcb3003b04b89f,
+      type: 3}
+  - agent_1: {fileID: 7489412252100897815, guid: 1ed6d9b02a66a455d8c00f4fefd9eafb,
+      type: 3}
+  - agent_2: {fileID: 1872745413663986818, guid: c0967b0e52fd342f1927e3a0cb901b7d,
+      type: 3}
+  - agent_3: {fileID: 6628939254528081298, guid: c27a6539a01874f35a07090a075ceb52,
+      type: 3}
+  - agent_4: {fileID: 1605525624779121606, guid: 4a1c592c8b30e4f6aaf28ee279645d57,
+      type: 3}
+  - agent_5: {fileID: 4263770917222142571, guid: 8d57febafb2704d6cb8c0453c1c2eaf5,
+      type: 3}
+  - agent_6: {fileID: 461589728580989910, guid: 21cd680a276b047a2a048b11510b2dcc,
+      type: 3}
+  - dest: {fileID: 1291036354705755244, guid: e48c720d310a24cd1a8dad126d9dab4d, type: 3}
+  - dest_0: {fileID: 5062900051559939977, guid: a915ef208b74b4b09a21e08e16766f1c,
+      type: 3}
+  - dest_1: {fileID: 6792076157800478223, guid: d423ed2246bc7415fa270412ed44ad90,
+      type: 3}
+  - dest_2: {fileID: 3135867152945668226, guid: 866f76bfb1a304d3883f7ead7cee6807,
+      type: 3}
+  - dest_3: {fileID: 5523840248250735575, guid: 93e30ce804bf049ff820b94218244d03,
+      type: 3}
+  - dest_4: {fileID: 1971785771658573153, guid: 50275fb44b4414d1f85a946c260f12e4,
+      type: 3}
+  - dest_5: {fileID: 7208786508983945810, guid: 2fb9e8ff003324636bc1dbd3c5f00ee7,
+      type: 3}
+  - dest_6: {fileID: 1595673874704017378, guid: 9a6d3bbfef1fe44f5b0585ca368a47d8,
+      type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
