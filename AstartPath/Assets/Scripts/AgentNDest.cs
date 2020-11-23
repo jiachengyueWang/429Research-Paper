@@ -12,6 +12,13 @@ public class AgentNDest : MonoBehaviour
     Vector3 agent_position;
     Vector3 dest_position;
 
+
+
+    GameObject[] wayPoints;
+    public float speed = 2;
+    public bool rand = false;
+    public bool go = true;
+
     private Grid grid;
     private SetUp setup;
     bool isDone = false;
@@ -28,6 +35,18 @@ public class AgentNDest : MonoBehaviour
     void Update()
     {
 
+    }
+
+    public void Move(ArrayList path, GameObject ai){
+        foreach(Cell cell in path){
+            ai.transform.LookAt(cell.transform.position);
+            // ai.transform.position += ai.transform.forward * Time.deltaTime;
+            ai.transform.position = cell.transform.position;
+            // ai.transform.position = Vector3.MoveTowards(transform.position, cell.transform.position, Time.deltaTime * 1.2f);
+            Debug.Log(ai.transform.position);
+            // agent_in_use.transform.LookAt(cell.transform.position);
+            // agent_in_use.transform.position += agent_in_use.transform.forward * speed * Time.deltaTime;
+        }   
     }
 
 

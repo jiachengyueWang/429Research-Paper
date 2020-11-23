@@ -10,9 +10,6 @@ public class Cell : MonoBehaviour {
   public float F;
   public float G;
   public float H;
-  // public TextMesh displayF;
-  // public TextMesh displayG;
-  // public TextMesh displayH;
   public TextMesh displayID;
   public GameObject indicator;
   public GameObject indicatorDisplay;
@@ -26,13 +23,7 @@ public class Cell : MonoBehaviour {
   private Renderer currentRenderer;
   private Grid grid;
 
-
-
-  //WJCY
   private SetUp setup;
-  //wjcy
-
-
 
 
   void Awake() {
@@ -44,19 +35,6 @@ public class Cell : MonoBehaviour {
     grid = FindObjectOfType<Grid>();
     setup = FindObjectOfType<SetUp>();
   }
-
-
-
-
-  //WJCY
-  void Update(){
-
-  }
-
-  //wjcy
-
-
-
 
   public void Reset() {
     parent = null;
@@ -76,30 +54,6 @@ public class Cell : MonoBehaviour {
   }
 
   void FixedUpdate() {
-    // Display Cell Information
-    // if (isValid) {
-    //   if (F == 0.0f) {
-    //     displayF.text = "";
-    //   } else {
-    //     displayF.text = "F: " + F.ToString("F2");
-    //   }
-
-    //   if (G == 0.0f) {
-    //     displayG.text = "";
-    //   } else {
-    //     displayG.text = "G: " + G.ToString("F2");
-    //   }
-
-    //   if (H == 0.0f) {
-    //     displayH.text = "";
-    //   } else {
-    //     displayH.text = "H: " + H.ToString("F2");
-    //   }
-    // } else {
-    //   displayF.text = "";
-    //   displayG.text = "";
-    //   displayH.text = "";
-    // }
 
     displayID.text = "" + id;
 
@@ -111,31 +65,6 @@ public class Cell : MonoBehaviour {
       indicatorRenderer.enabled = false;
   }
 
-  //WJCY: need adjustment to give different startid and targetid, corresponds to the pair
-
-  void OnTriggerEnter(Collider other){
-    if (other.tag == "Start")
-      grid.startID = this.id;
-    else if (other.tag == "Target")
-      grid.targetID = this.id;
-  }
-
-  public Cell getCell(int id){
-    Debug.Log("getPosition used");
-    if(this.id == id){
-      Debug.Log("found");
-      return this;
-    }else{
-      return null;
-    }
-  }
-
-
-
-  //wjcy
-
-
-
 
   void OnTriggerStay(Collider other) {
     if (other.tag == "Obstacle") {
@@ -144,13 +73,13 @@ public class Cell : MonoBehaviour {
         currentRenderer.material = materialInvalid;
       }
     } 
-    else if (other.tag == "Start"){
-      grid.startID = this.id;
-    }
+    // else if (other.tag == "Start"){
+    //   grid.startID = this.id;
+    // }
       
-    else if (other.tag == "Target"){
-      grid.targetID = this.id;
-    }
+    // else if (other.tag == "Target"){
+    //   grid.targetID = this.id;
+    // }
   }
 
   void OnTriggerExit(Collider other) {
@@ -284,5 +213,15 @@ public class Cell : MonoBehaviour {
 
   private bool IsInBounds(int i, ArrayList array) {
     return (i >= 0 && i < array.Count);
+  }
+
+  public Cell getCell(int id){
+    Debug.Log("getPosition used");
+    if(this.id == id){
+      Debug.Log("found");
+      return this;
+    }else{
+      return null;
+    }
   }
 }

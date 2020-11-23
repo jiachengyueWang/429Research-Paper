@@ -4,7 +4,6 @@ using System;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-
 public class Grid : MonoBehaviour {
   //CELL
   public GameObject cellPrefab;
@@ -14,16 +13,13 @@ public class Grid : MonoBehaviour {
   public int targetID;
   public bool isCalculating = false;
 
-
   public ArrayList allCells;
-
   private ArrayList openList;
   private ArrayList closedList;
   private Cell startCell;
   private Cell targetCell;
 
   private Cell cell;
-
 
   //WJCY
   //OBSTACLES
@@ -34,7 +30,6 @@ public class Grid : MonoBehaviour {
   //prefabs database
   List<GameObject> agents = new List<GameObject>();
   List<GameObject> destinations = new List<GameObject>();
-  //agents
   public GameObject agent;
   public GameObject agent_0;
   public GameObject agent_1;
@@ -43,7 +38,6 @@ public class Grid : MonoBehaviour {
   public GameObject agent_4;
   public GameObject agent_5;
   public GameObject agent_6;
-  //destinations
   public GameObject dest;
   public GameObject dest_0;
   public GameObject dest_1;
@@ -57,8 +51,6 @@ public class Grid : MonoBehaviour {
   List<int> agentID = new List<int>();
   List<int> destID = new List<int>();
   List<AgentNDest> pairs = new List<AgentNDest>();
-  // ArrayList<AgentNDest> pairs = new ArrayList<AgentNDest>();
-
 
   //GAME LEVEL
   int[] points_0 = new int[]{2, 5, 8, 10, 15, 19 };
@@ -73,29 +65,37 @@ public class Grid : MonoBehaviour {
   bool isDone = false;
   
   private SetUp setup;
+  private visibilityGraph graph;
   private AgentNDest ADpair;
-
-
   //wjcy
 
   void Start() {
 
     setup = FindObjectOfType<SetUp>();
+    graph = FindObjectOfType<visibilityGraph>();
     ADpair = FindObjectOfType<AgentNDest>();
 
-
+    //initialise the agent destination database
     initialise();
     CreateCells();
+    //generate the obstacles
     usedCell = setup.generateObstacleCenter();
-    createADpair(numPair);
-  }
 
-  void Update(){
+    //get the obstacle graph points, then intantiate
+    List<Vector3> obstacle_graph_points = setup.getObstacleGraphPoint();
+    graph.instantiate_vertex(obstacle_graph_points, false);
+
+    //get the alcove points, then instantiate
+    List<Vector3> alcove_graph_points = graph.graph_vertex_setup();
+    graph.instantiate_vertex(alcove_graph_points, true);
+
+    //add the obstacle graph points
+    graph.Draw_graph(obstacle_graph_points);
+    createADpair(numPair);
   }
 
   //initialise the prefab database
   public void initialise(){
-    Debug.Log("initialise");
     //add Agents prefab
     agents.Add(agent);
     agents.Add(agent_0);
@@ -175,6 +175,9 @@ public class Grid : MonoBehaviour {
       //create a new pair
       GameObject newAgent = (GameObject) Instantiate(agents[i % 7], agent_position, Quaternion.identity);
       GameObject newDest = (GameObject) Instantiate(destinations[i % 7], dest_position, Quaternion.identity);
+
+      // GameObject obj = new GameObject();
+      // AgentNDest newPair = obj.AddComponent<AgentNDest>();
       AgentNDest newPair = new AgentNDest(newAgent, newDest, agent_position, dest_position);
       pairs.Add(newPair);
 
@@ -221,8 +224,8 @@ public class Grid : MonoBehaviour {
     return overlap;
   }
 
+
   public void createAlcoves(int[] points_0, int[] points_1, int[] points_2, int[] points_3){
-    
     //x-axis UP
     int id = 374;
     alcove_length(points_0, 3, 5, 2, id, true);
@@ -238,8 +241,8 @@ public class Grid : MonoBehaviour {
     //z-axis RIGHT
     id = 447;
     alcove_width(points_3, 3, 1, id, true);
-
   }
+
 
   void alcove_length(int[] points, int t0, int t1, int t2, int id, bool up){
     GameObject newCell;
@@ -260,7 +263,6 @@ public class Grid : MonoBehaviour {
         id++;
         allCells.Add(newCell);
         allCells_position.Add(newCell.transform.position);
-
       }
       x++;
     }
@@ -315,7 +317,6 @@ public class Grid : MonoBehaviour {
         }else {
           position = new Vector3 (0 - i, 0, z);
         }
-        
         newCell = (GameObject)Instantiate(cellPrefab, position, transform.rotation);
         newCell.GetComponent<Cell>().id = id;
         id++;
@@ -333,8 +334,7 @@ public class Grid : MonoBehaviour {
           position = new Vector3 (23 + i, 0, z);
         }else {
           position = new Vector3 (0 - i, 0, z);
-        }
-        
+        } 
         newCell = (GameObject)Instantiate(cellPrefab, position, transform.rotation);
         newCell.GetComponent<Cell>().id = id;
         id++;
@@ -432,6 +432,8 @@ public class Grid : MonoBehaviour {
     path.Add(currentCell);
     path.Reverse();
 
+
+
     //draw path
     LineRenderer lineRenderer = GetComponent<LineRenderer>();
     lineRenderer.positionCount = path.Count;
@@ -443,13 +445,9 @@ public class Grid : MonoBehaviour {
     }
 
     isCalculating = false;
-    
-    //WJCY
 
     //after found the path and drew it, update to the next 
     isDone = true;
-    //wjcy
-
   }
 
   private ArrayList GetAdjacentCells(Cell currentCell) {
@@ -477,7 +475,6 @@ public class Grid : MonoBehaviour {
     targetCell = tempTargetCell.GetComponent<Cell>();
     targetCell.SetToTarget();
   }
-
 
   //helpers
   public ArrayList get_path(){
@@ -515,11 +512,8 @@ public class Grid : MonoBehaviour {
     return this.pairs;
   }
 
-
   public void RemoveLocation(Vector3 position){
-    Debug.Log(usedCell.Count);
     usedCell.Remove(position);
-    Debug.Log(usedCell.Count);
   }
 }
 

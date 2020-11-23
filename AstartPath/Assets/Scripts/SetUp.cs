@@ -8,6 +8,7 @@ public class SetUp : MonoBehaviour
 {
 
     private Grid grid;
+    // private visibilityGraph graph;
 
     //obstacles
     public GameObject obstacle_block;
@@ -30,6 +31,7 @@ public class SetUp : MonoBehaviour
     int[] points_1;
     int[] points_2;
     int[] points_3;
+    List<Vector3> obstacle_graph_points = new List<Vector3>();
 
     // Start is called before the first frame update
     void Start()
@@ -40,60 +42,30 @@ public class SetUp : MonoBehaviour
         points_1 = grid.get_points(1);
         points_2 = grid.get_points(2);
         points_3 = grid.get_points(3);
-        
-        // generateObstacleCenter();
-        // reducedVisibilityGraph();
-        // generateAgents();
-        // generateDest();
-    }
 
-
-    // Update is called once per frame
-    void Update()
-    {
-    }
-
-
-    //reduced visibility graph
-    void reducedVisibilityGraph(){
-        LineRenderer lineRenderer = GetComponent<LineRenderer>();
-        lineRenderer.positionCount = path.Count;
-        
-        // lineRenderer.SetPosition(i, cell.transform.position + new Vector3(0, 1, 0));
     }
 
     public ArrayList generateObstacleCenter(){
         //spawn Obstacles
         int spawned = 0;
         //Generate the first obstacle
-        Vector3 position = new Vector3(Random.Range(xPos, xPos + 20f), 0.3f, Random.Range(zPos, zPos + 15f));
+        Vector3 position = new Vector3(Random.Range(xPos, xPos + 19.5f), 0.3f, Random.Range(zPos, zPos + 15f));
         Vector3 last = position;
         Instantiate(obstacle_block, position, Quaternion.identity);
-        // Debug.Log("first obstacle center" + position);
         locations.Add(position);
         generateObstacle(position);
         spawned++;
 
-        // Debug.Log("1 obstacle DONE");
-
         //spawn another 3 obstacles
 		while (spawned < numObstacles) {
             //generate a random location
-            position = new Vector3(Random.Range(xPos, xPos + 20f), 0.3f, Random.Range(zPos, zPos + 15f));
-            // Debug.Log("first recommend " + position);
-
+            position = new Vector3(Random.Range(xPos, xPos + 19.5f), 0.3f, Random.Range(zPos, zPos + 15f));
             //check if this location overlaps with others, if it does, keep updating the location
-            while (overlap(position))
-            {
-                position = new Vector3(Random.Range(xPos, xPos + 20f), 0.3f, Random.Range(zPos, zPos + 15f));
-            }
-            // Debug.Log(position);
-            // Debug.Log(inRadius(last, position));
+            while (overlap(position)){ position = new Vector3(Random.Range(xPos, xPos + 19.5f), 0.3f, Random.Range(zPos, zPos + 15f));}
             Instantiate(obstacle_block, position, Quaternion.identity);
             locations.Add(position);
             generateObstacle(position);
             spawned++;
-            // Debug.Log( spawned + " obstacle DONE");
         }
         return locations;
     }
@@ -109,6 +81,10 @@ public class SetUp : MonoBehaviour
             Instantiate(obstacle_block, loc, Quaternion.identity);
             // Debug.Log("lateral obstacle" + loc);
             locations.Add(loc);
+
+            obstacle_graph_points.Add(loc + new Vector3(0.6f, 0.2f, 0.6f));
+            obstacle_graph_points.Add(loc + new Vector3(-0.6f, 0.2f, 0.6f));
+
             int horizontal = Random.Range(0, 100);
             if (horizontal % 2 == 0 || center.x <= 3)
             {
@@ -116,28 +92,47 @@ public class SetUp : MonoBehaviour
                 Instantiate(obstacle_block, loc, Quaternion.identity);
                 locations.Add(loc);
                 // Debug.Log("lateral obstacle" + loc);
+
                 loc = new Vector3(center.x + 2, center.y, center.z);
                 Instantiate(obstacle_block, loc, Quaternion.identity);
                 locations.Add(loc);
                 // Debug.Log("lateral obstacle" + loc);
+
+                obstacle_graph_points.Add(loc + new Vector3(0.6f, 0.2f, 0.6f));
+                obstacle_graph_points.Add(loc + new Vector3(0.6f, 0.2f, -0.6f));
+
+                obstacle_graph_points.Add(center + new Vector3(-0.6f, 0.2f, -0.6f));
+                obstacle_graph_points.Add(center + new Vector3(0.6f, 0.2f, 0.6f));
+
+
             }
             else if(horizontal % 2 == 1 || center.x >= 17)
             {
                 loc = new Vector3(center.x - 1, center.y, center.z);
                 Instantiate(obstacle_block, loc, Quaternion.identity);
                 locations.Add(loc);
+                obstacle_graph_points.Add(loc + new Vector3(0.6f, 0.2f, 0.6f));
                 // Debug.Log("lateral obstacle" + loc);
                 loc = new Vector3(center.x - 2, center.y, center.z);
                 Instantiate(obstacle_block, loc, Quaternion.identity);
                 locations.Add(loc);
                 // Debug.Log("lateral obstacle" + loc);
-            }
 
+                obstacle_graph_points.Add(loc + new Vector3(-0.6f, 0.2f, 0.6f));
+                obstacle_graph_points.Add(loc + new Vector3(-0.6f, 0.2f, -0.6f));
+
+                obstacle_graph_points.Add(center + new Vector3(0.6f, 0.2f, -0.6f));
+                obstacle_graph_points.Add(center + new Vector3(-0.6f, 0.2f, 0.6f));
+            }
         }
         else if (vertical % 2 == 1 || center.z >= 12) {
             loc = new Vector3(center.x, center.y, center.z - 1);
             Instantiate(obstacle_block, loc, Quaternion.identity);
             locations.Add(loc);
+
+            obstacle_graph_points.Add(loc + new Vector3(0.6f, 0.2f, -0.6f));
+            obstacle_graph_points.Add(loc + new Vector3(-0.6f, 0.2f, -0.6f));
+
             // Debug.Log("lateral obstacle " + loc);
             int horizontal = Random.Range(0, 1);
 			if (horizontal % 2 == 0 || center.x <= 3)
@@ -145,14 +140,25 @@ public class SetUp : MonoBehaviour
                 loc = new Vector3(center.x + 1, center.y, center.z);
                 Instantiate(obstacle_block, loc, Quaternion.identity);
                 locations.Add(loc);
+
+                obstacle_graph_points.Add(loc + new Vector3(0.6f, 0.2f, 0.6f));
+                obstacle_graph_points.Add(loc + new Vector3(0.6f, 0.2f, -0.6f));
                 // Debug.Log("lateral obstacle " + loc);
+
+                obstacle_graph_points.Add(center + new Vector3(-0.6f, 0.2f, 0.6f));
+                obstacle_graph_points.Add(center + new Vector3(0.6f, 0.2f, -0.6f));
             }
             else if(horizontal % 2 == 1 || center.x >= 17)
             {
                 loc = new Vector3(center.x - 1, center.y, center.z);
                 Instantiate(obstacle_block, loc, Quaternion.identity);
                 locations.Add(loc);
+
+                obstacle_graph_points.Add(loc + new Vector3(-0.6f, 0.2f, 0.6f));
+                obstacle_graph_points.Add(loc + new Vector3(-0.6f, 0.2f, -0.6f));
                 // Debug.Log("lateral obstacle " + loc);
+                obstacle_graph_points.Add(center + new Vector3(0.6f, 0.2f, 0.6f));
+                obstacle_graph_points.Add(center + new Vector3(0.6f, 0.2f, -0.6f));
             }
         }
     }
@@ -200,10 +206,7 @@ public class SetUp : MonoBehaviour
         bool overlap = false;
         foreach (Vector3 loc_used in locations) {
             //if distance between them < 3, then not a valid location -> returns true
-			if (Math.Abs(loc.x - loc_used.x) < 4 && Math.Abs(loc.z - loc_used.z) < 4) { 
-                // Debug.Log("distance x" + Math.Abs(loc.x - locations[i].x) + "distance y " + Math.Abs(loc.z - locations[i].z));
-                return true;
-            }
+			if (Math.Abs(loc.x - loc_used.x) < 4 && Math.Abs(loc.z - loc_used.z) < 4) return true;
         }
         // Debug.Log(overlap);
         return overlap;
@@ -212,18 +215,17 @@ public class SetUp : MonoBehaviour
     //for updating the dest position
     public Vector3 nextDestPosition(){
         Vector3 position_dest = new Vector3(Random.Range(xPos, xPos + 20f), 0f, Random.Range(zPos, zPos + 15f));
-
         //spawn the destination of the agent
-        while (overlap(position_dest))
-        {
-            position_dest = new Vector3(Random.Range(xPos, xPos + 20f), 0f, Random.Range(zPos, zPos + 15f));
-        }
-
+        while (overlap(position_dest)){ position_dest = new Vector3(Random.Range(xPos, xPos + 20f), 0f, Random.Range(zPos, zPos + 15f)); }
         return position_dest;
     }
 
     public void removeLocation(Vector3 position){
         locations.Remove(position);
+    }
+
+    public List<Vector3> getObstacleGraphPoint(){
+        return this.obstacle_graph_points;
     }
 
 
